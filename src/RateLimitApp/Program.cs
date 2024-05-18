@@ -33,6 +33,30 @@ builder.Services.AddRateLimiter(options =>
     }).RejectionStatusCode = 429;
 });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddConcurrencyLimiter("ConcurrencyPolicy", opt =>
+    {
+        opt.PermitLimit = 1;
+        opt.QueueLimit = 1;
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    }).RejectionStatusCode = 429;
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddTokenBucketLimiter("TokenBucketPolicy", opt =>
+    {
+        opt.TokenLimit = 4; 
+        opt.QueueLimit = 2;
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.ReplenishmentPeriod = TimeSpan.FromSeconds(10);
+        opt.TokensPerPeriod = 4;
+        opt.AutoReplenishment = true;
+    }).RejectionStatusCode = 429;
+});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
